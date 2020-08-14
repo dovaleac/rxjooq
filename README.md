@@ -1,14 +1,14 @@
-## Purpose
+# Purpose
 
 Connecting to jooq in a reactive manner, and retrieving data in
 RxJava structures, like `Flowable`, `Single`, `Maybe` and 
 `Completable`.
 
-## Usage
+# Usage
 
 The entrypoint is the `RxJooqFacade` class.
 
-### Obtaining an instance of `RxJooqRunner`
+## Obtaining an instance of `RxJooqRunner`
 
 After you obtain your `RxJooqFacade` instance, you have to specify
 a way of connecting to the database (there are several ways of 
@@ -21,7 +21,7 @@ RxJooqRunner runner = rxJooqFacade
     .withExecutor(executor); //this line is optional
 ```
 
-### Retrieving a single record
+## Retrieving a single record
 
 Typically, when you query a database, you cannot be sure whether
 it will return a record or not, due to the query filters. For this
@@ -45,7 +45,7 @@ Single<GameRecord> gameRecord = rxJooqRunner.queryFirstResult(
         .and(GAME.STATUS.eq(GameStatus.CREATED.name()));
 ```
 
-### Retrieving several records
+## Retrieving several records
 
 In this case, we'll return all the matched elements:
 
@@ -57,7 +57,7 @@ Flowable<GameRecord> gameRecords = rxJooqRunner.querySeveralResults(
         .and(GAME.STATUS.eq(GameStatus.CREATED.name()));
 ```
 
-### Running a query which doesn't return anything
+## Running a query which doesn't return anything
 
 Given that we don't care about the result, we'll return a
 `Completable`:
@@ -71,13 +71,13 @@ Completable insertAnswer = rxJooqRunner.executeReactive(
            .values(answer));
 ```
 
-## Constraints
+# Constraints
 
 You have to tell your dependency injector to inject 
 `RxJooqFacadeImpl` as `RxJooqFacade` and
 `DslContextAdapterImpl` as `DslContextAdapter`.
 
-## Future improvements
+# Future improvements
 
 By the moment, `Flowable`s cannot be obtained in other threads,
 even if you pass an executor. 
