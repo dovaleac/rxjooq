@@ -29,8 +29,14 @@ public abstract class AbstractRxJooqRunner implements RxJooqRunner {
             Flowable.create(
                 flowableEmitter -> {
                   try {
-                    producer.apply(dslContext).forEach(flowableEmitter::onNext);
-                    flowableEmitter.onComplete();
+                    ResultQuery<T> preFetch = producer.apply(dslContext);
+                    CompletionStage<Result<T>> fetched =
+                        executor == null ? preFetch.fetchAsync() : preFetch.fetchAsync(executor);
+                    fetched.thenAccept(
+                        t -> {
+                            t.forEach(flowableEmitter::onNext);
+                            flowableEmitter.onComplete();
+                        });
                   } catch (Exception e) {
                     flowableEmitter.onError(e);
                   }
@@ -38,6 +44,24 @@ public abstract class AbstractRxJooqRunner implements RxJooqRunner {
                 BackpressureStrategy.BUFFER),
         DSLContext::close);
   }
+  //  @Override
+  //  public <T extends Record> Flowable<T> querySeveralResults(
+  //      Function<DSLContext, ResultQuery<T>> producer) {
+  //    return Flowable.using(
+  //        dslContextSupplier,
+  //        dslContext ->
+  //            Flowable.create(
+  //                flowableEmitter -> {
+  //                  try {
+  //                    producer.apply(dslContext).forEach(flowableEmitter::onNext);
+  //                    flowableEmitter.onComplete();
+  //                  } catch (Exception e) {
+  //                    flowableEmitter.onError(e);
+  //                  }
+  //                },
+  //                BackpressureStrategy.BUFFER),
+  //        DSLContext::close);
+  //  }
 
   @Override
   public <RT extends Record> Maybe<RT> queryFirstResultIfAny(

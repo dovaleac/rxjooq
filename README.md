@@ -77,8 +77,4 @@ You have to tell your dependency injector to inject
 `RxJooqFacadeImpl` as `RxJooqFacade` and
 `DslContextAdapterImpl` as `DslContextAdapter`.
 
-# Future improvements
-
-By the moment, `Flowable`s cannot be obtained in other threads,
-even if you pass an executor. 
 
